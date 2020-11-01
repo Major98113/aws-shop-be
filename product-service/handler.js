@@ -1,18 +1,49 @@
-'use strict';
+import products from './products.json';
+import ProductsService from './services/products.service';
 
-module.exports.hello = async event => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
-  };
+export const getProductById = async event => {
+  try{
+    const { productId = '' } = event.pathParameters;
+    const productsServiceInstance = new ProductsService( products );
+    const desiredProduct = await productsServiceInstance.getProductById( productId );
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+    if( !desiredProduct )
+      return {
+        statusCode: 404,
+        body: "Product not found!"
+      };
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify( desiredProduct )
+    }
+  }
+  catch(error) {
+    console.error(JSON.stringify(error));
+
+    return {
+      statusCode: 500,
+      body: "Something went wrong!"
+    };
+  }
+};
+
+export const getAllProducts = async event => {
+  try{
+    const productsServiceInstance = new ProductsService( products );
+    const allProducts = await productsServiceInstance.getProductsList();
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify( allProducts )
+    }
+  }
+  catch(error) {
+    console.error(JSON.stringify(error));
+    
+    return {
+      statusCode: 500,
+      body: "Something went wrong!"
+    };
+  }
 };
