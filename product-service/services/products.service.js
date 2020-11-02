@@ -6,7 +6,7 @@ export default class ProductsService {
     }
 
     async getProductById( id ){
-        const desiredProduct = products.find( ( item, i ) => item.id === id );
+        const desiredProduct = products.find( ( item ) => item.id === id );
         
         return desiredProduct;
     }
