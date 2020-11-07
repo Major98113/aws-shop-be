@@ -15,6 +15,9 @@ export const getProductById = async event => {
     
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify( desiredProduct )
     }
   }
