@@ -2,6 +2,8 @@ import ProductsService from '../services/products.service';
 
 export const getAllProducts = async event => {
   try{
+    console.info( "getAllProducts handler was invoked" );
+
     const productsServiceInstance = new ProductsService( process.env );
     
     await productsServiceInstance.DB.connect();

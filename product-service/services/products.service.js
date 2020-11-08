@@ -40,13 +40,22 @@ export default class ProductsService {
 
     async createProduct( product ) {
         try{
-            const { title, description, price, logo, count = '' } = product;
-            const resultProductRecord = await this.DB.query(
+            const { title, description, price, logo, count } = product;
+            const { rows: [ createdProductRecord ] } = await this.DB.query(
                 `INSERT INTO products ( title, description, price, logo ) VALUES
-                 ( '${ title }', '${ description }', ${ price }, '${ logo }' )`
+                 ( '${ title }', '${ description }', ${ price }, '${ logo }' ) 
+                RETURNING *`
             );
+            const { rows: [ createdStockRecord ] } = await this.DB.query(
+                `INSERT INTO stocks ( product_id, count ) VALUES
+                 ( '${ createdProductRecord.id }', ${ count } ) 
+                RETURNING *`
+            ); 
 
-            return resultProductRecord;
+            return {
+                ...createdProductRecord,
+                count: createdStockRecord.count
+            };
         }
         catch( error ) {
             console.log( "Method createProduct. Error: ", error );

@@ -1,6 +1,8 @@
 import ProductsService from '../services/products.service';
 export const getProductById = async event => {
   try{
+    console.info( "getProductById handler was invoked with next id: ", event.pathParameters.productId );
+
     const { productId = '' } = event.pathParameters;
     const productsServiceInstance = new ProductsService( process.env );
     

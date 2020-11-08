@@ -2,6 +2,8 @@ import ProductsService from '../services/products.service';
 
 export const createProduct = async event => {
     try{
+        console.info( "createProduct handler was invoked with next args: ", JSON.stringify( event.body ) );
+        
         const productsServiceInstance = new ProductsService( process.env );
         
         await productsServiceInstance.DB.connect();
@@ -18,7 +20,7 @@ export const createProduct = async event => {
           body: JSON.stringify( createdProduct )
         }
       }
-      catch(error) {
+    catch(error) {
         console.error(JSON.stringify(error));
         
         return {
