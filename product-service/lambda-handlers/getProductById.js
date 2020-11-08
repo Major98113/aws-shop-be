@@ -1,10 +1,11 @@
-import products from '../products.json';
 import ProductsService from '../services/products.service';
-
 export const getProductById = async event => {
   try{
     const { productId = '' } = event.pathParameters;
-    const productsServiceInstance = new ProductsService( products );
+    const productsServiceInstance = new ProductsService( process.env );
+    
+    await productsServiceInstance.DB.connect();
+
     const desiredProduct = await productsServiceInstance.getProductById( productId );
 
     if( !desiredProduct )

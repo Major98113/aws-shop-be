@@ -1,9 +1,11 @@
-import products from '../products.json';
 import ProductsService from '../services/products.service';
 
 export const getAllProducts = async event => {
   try{
-    const productsServiceInstance = new ProductsService( products );
+    const productsServiceInstance = new ProductsService( process.env );
+    
+    await productsServiceInstance.DB.connect();
+
     const allProducts = await productsServiceInstance.getProductsList();
     
     return {
