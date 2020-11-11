@@ -43,12 +43,12 @@ export default class ProductsService {
             const { title, description, price, logo, count } = product;
             const { rows: [ createdProductRecord ] } = await this.DB.query(
                 `INSERT INTO products ( title, description, price, logo ) VALUES
-                 ( '${ title }', '${ description }', ${ price }, '${ logo }' ) 
+                 ( '${ title }', '${ description }', ${ Number( price ) }, '${ logo }' ) 
                 RETURNING *`
             );
             const { rows: [ createdStockRecord ] } = await this.DB.query(
                 `INSERT INTO stocks ( product_id, count ) VALUES
-                 ( '${ createdProductRecord.id }', ${ count } ) 
+                 ( '${ createdProductRecord.id }', ${ Number( count ) } ) 
                 RETURNING *`
             ); 
 
