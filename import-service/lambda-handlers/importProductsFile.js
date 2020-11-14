@@ -11,7 +11,6 @@ export const importProductsFile = async event => {
         ContentType: 'application/vnd.ms-excel'
       };
       const S3 = new AWS.S3({ region: 'us-east-1' });
-
       const url = await S3.getSignedUrlPromise( 'putObject', params );
 
       return {
