@@ -14,3 +14,23 @@ There is one part of AWS shop, which include backend part of that API
     </code>
 </p>
 
+<p>
+    For creating Public Bucket Policy, you need to dismiss "Block all public access" option and add next policy in field:
+    <pre>
+            {
+                "Version": "2008-10-17",
+                "Statement": [
+                    {
+                        "Sid": "AllowPublicRead",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "*"
+                        },
+                        "Action": "s3:GetObject",
+                        "Resource": "arn:aws:s3:::aws-shop-be-import-service/*"
+                    }
+                ]
+            }
+    </pre>
+</p>
+
