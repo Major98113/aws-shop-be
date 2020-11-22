@@ -2,12 +2,32 @@ import AWS from 'aws-sdk';
 import CSV from 'csv-parser';
 import { BUCKET } from '../constants/bucket-constants';
 
+const results = [];
+
+const uploadRecordToSqs = async ( record ) => {
+  try{
+    const { SQS_CATALOG_ITEMS_QUEUE } = process.env;
+    const sqs = new AWS.SQS();
+
+    console.log( "Data for upload: ", record );
+    console.log( "Url for upload: ", SQS_CATALOG_ITEMS_QUEUE );
+
+    return await sqs.sendMessage({
+      QueueUrl: SQS_CATALOG_ITEMS_QUEUE,
+      MessageBody: JSON.stringify( record )
+    }).promise();
+  }
+  catch( error ) {
+    console.error( "Error while SQS data uploading", error );
+  }
+}
+
 const asyncReadableStreamForTheRecords = async ( readableStream ) => {
     return new Promise (
         ( resolve, reject ) => {
             readableStream
                 .pipe( CSV() )
-                .on( 'data', ( data ) => console.log( "Record: ", data ) )
+                .on( 'data', ( data ) => results.push( data ) )
                 .on( 'error', reject )
                 .on( 'end', () => { 
                     console.log( "End of parsed records");
@@ -31,6 +51,18 @@ export const importFileParser = async event => {
         const readableStream = S3.getObject( params ).createReadStream();
         
         await asyncReadableStreamForTheRecords( readableStream );
+
+        await Promise.all( 
+          results.map( async ( record ) => {
+            try {
+              await uploadRecordToSqs( record );
+              console.info( `Message ${ record } was successfully uploaded in SQS` );
+            }
+            catch( err ) {
+              console.log( `Error in sending message proccess: ${ err }`);
+            }
+          })
+        )
       }
 
       return {
@@ -42,6 +74,7 @@ export const importFileParser = async event => {
       }
     }
     catch(error) {
+
       console.error( "Critical unHandled exception:", error );
       return {
         statusCode: 500,
