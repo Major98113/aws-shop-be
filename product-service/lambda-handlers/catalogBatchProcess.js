@@ -10,9 +10,19 @@ export const catalogBatchProcess = async ( event, context, callback ) => {
         
       await productsServiceInstance.DB.connect();
       
-      console.log( "createdProduct started : ", JSON.stringify( record ) );
+      console.log( "createdProduct started" );
       const createdProduct = await productsServiceInstance.createProduct( record );
-      console.log( "createdProduct finished : ", JSON.stringify( createdProduct ) );
+      console.log( "createdProduct finished" );
+
+      const sns = new AWS.SNS();
+
+      console.log( "Start notification to: ", process.env.SNS_ARN );
+      await sns.publish({
+        Subject: "Product created",
+        Message: JSON.stringify( createdProduct ),
+        TopicArn: process.env.SNS_ARN
+      }).promise();
+      console.log( "Finish notification");
     }
   
     return {
