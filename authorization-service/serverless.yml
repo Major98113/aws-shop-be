@@ -14,5 +14,5 @@ custom:
     includeModules: true
 
 functions:
-  hello:
+  basicAuthorizer:
     handler: handler.basicAuthorizer

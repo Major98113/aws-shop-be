@@ -26,6 +26,10 @@ provider:
       Action: "sqs:*"
       Resource:
         - ${cf:product-service-dev.ExportCatalogItemsQueueArn}
+    - Effect: Allow
+      Action: "execute-api:Invoke"
+      Resource: 
+        - "arn:aws:lambda:us-east-1:909702626061:function:authorization-service-dev-basicAuthorizer"
 
 plugins:
   - serverless-webpack
@@ -43,6 +47,11 @@ functions:
           path: import
           method: get
           cors: true
+          authorizer:
+            arn: arn:aws:lambda:us-east-1:909702626061:function:authorization-service-dev-basicAuthorizer
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: request
           request: 
             parameters: 
               querystrings:
