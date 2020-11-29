@@ -9,9 +9,6 @@ const uploadRecordToSqs = async ( record ) => {
     const { SQS_CATALOG_ITEMS_QUEUE } = process.env;
     const sqs = new AWS.SQS();
 
-    console.log( "Data for upload: ", record );
-    console.log( "Url for upload: ", SQS_CATALOG_ITEMS_QUEUE );
-
     return await sqs.sendMessage({
       QueueUrl: SQS_CATALOG_ITEMS_QUEUE,
       MessageBody: JSON.stringify( record )
@@ -50,19 +47,28 @@ export const importFileParser = async event => {
           };
         const readableStream = S3.getObject( params ).createReadStream();
         
+        console.info( `Start reading from S3 bucket`);
+        
         await asyncReadableStreamForTheRecords( readableStream );
+        
+        console.info( `Finished reading from S3 bucket`);
+        console.info( `Started SQS uploading`);
 
         await Promise.all( 
           results.map( async ( record ) => {
             try {
               await uploadRecordToSqs( record );
-              console.info( `Message ${ record } was successfully uploaded in SQS` );
+
+              console.info( `Message ${ JSON.stringify( record ) } was successfully uploaded in SQS` );
             }
             catch( err ) {
               console.log( `Error in sending message proccess: ${ err }`);
             }
           })
-        )
+        );
+
+      console.info( `FInished SQS uploading`);
+
       }
 
       return {

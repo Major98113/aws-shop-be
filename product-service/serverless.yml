@@ -8,6 +8,7 @@ provider:
   region: us-east-1
 
   environment:
+    
   
   iamRoleStatements:
     - Effect: "Allow"
@@ -70,8 +71,8 @@ functions:
     handler: handler.catalogBatchProcess
     events:
       - sqs:
-        batchSize: 5
-        arn:
-          Fn::GetAtt:
-            - SQSQueue
-            - Arn
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
